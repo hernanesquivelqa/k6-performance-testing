@@ -17,14 +17,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Paso 2: Instalar k6
-      - name: Install k6
+      # Paso 2: Configurar el repositorio y la clave de k6
+      - name: Add k6 repository and install
         run: |
-          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1B7D
+          sudo mkdir -p /usr/share/keyrings
+          curl -s https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
           sudo apt-get update
           sudo apt-get install -y k6
 
-      # Paso 3: Ejecutar la prueba de k6 y enviar a Grafana Cloud
+      # Paso 3: Ejecutar la prueba de k6
       - name: Run k6 performance test
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
