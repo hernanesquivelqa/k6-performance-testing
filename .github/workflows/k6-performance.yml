@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  performance-test:
+  k6-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,8 +17,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Paso 2: Configurar el repositorio y la clave de k6
-      - name: Add k6 repository and install
+      # Paso 2: Instalar k6 (solo una vez)
+      - name: Install k6
         run: |
           sudo mkdir -p /usr/share/keyrings
           curl -s https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
@@ -26,9 +26,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y k6
 
-      # Paso 3: Ejecutar la prueba de k6
+      # Paso 3: Ejecutar el smoke test
+      - name: Run k6 smoke test
+        run: k6 run smoke-test.js
+
+      # Paso 4: Ejecutar el performance test si smoke pasa
       - name: Run k6 performance test
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: |
-          k6 run --out cloud stress-test-csv.js
+        run: k6 run --out cloud stress-test-csv.js

@@ -24,7 +24,7 @@ export const options = {
 };
 
 export default function () {
-  const пользователь = users[__VU % users.length];
+  const user = users[__VU % users.length];
 
   const loginPayload = JSON.stringify({
     email: user.email,
