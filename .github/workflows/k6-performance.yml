@@ -26,12 +26,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y k6
 
-      # Paso 3: Ejecutar el smoke test
-      - name: Run k6 smoke test
-        run: k6 run smoke-test.js
+      # Paso 3: Ejecutar el smoke test en la nube
+      - name: Run k6 smoke test in cloud
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        run: k6 run --out cloud smoke-test.js
 
-      # Paso 4: Ejecutar el performance test si smoke pasa
-      - name: Run k6 performance test
+      # Paso 4: Ejecutar el performance test en la nube
+      - name: Run k6 performance test in cloud
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: k6 run --out cloud stress-test-csv.js
