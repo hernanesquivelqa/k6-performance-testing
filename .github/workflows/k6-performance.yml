@@ -7,10 +7,10 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch: # Permite ejecución manual con opciones
+  workflow_dispatch:
     inputs:
       test_type:
-        description: 'Tipo de prueba a ejecutar (smoke o performance)'
+        description: 'Tipo de prueba a ejecutar (smoke, performance, spike)'
         required: true
         default: 'smoke'
 
@@ -19,11 +19,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Paso 1: Clonar el repositorio
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Paso 2: Instalar k6
       - name: Install k6
         run: |
           sudo mkdir -p /usr/share/keyrings
@@ -32,14 +30,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y k6
 
-      # Paso 3: Ejecutar smoke test si corresponde
       - name: Run k6 smoke test
         if: github.event_name != 'workflow_dispatch' || inputs.test_type == 'smoke'
         run: k6 run smoke-test.js
 
-      # Paso 4: Ejecutar performance test si corresponde
-      - name: Run k6 performance test
-        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'performance'
+      - name: Run k6 stress test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'stress'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: k6 run --out cloud stress-test-csv.js
+
+      - name: Run k6 spike test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'spike'
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        run: k6 run --out cloud spike-test.js
