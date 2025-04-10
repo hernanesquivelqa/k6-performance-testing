@@ -13,11 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Paso 1: Clonar el repositorio
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Paso 2: Instalar k6 (solo una vez)
       - name: Install k6
         run: |
           sudo mkdir -p /usr/share/keyrings
@@ -26,13 +24,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y k6
 
-      # Paso 3: Ejecutar el smoke test en la nube
-      - name: Run k6 smoke test in cloud
-        env:
-          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: k6 run --out cloud smoke-test.js
+      - name: Run k6 smoke test locally
+        run: k6 run smoke-test.js
 
-      # Paso 4: Ejecutar el performance test en la nube
       - name: Run k6 performance test in cloud
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
