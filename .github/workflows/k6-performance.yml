@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       test_type:
-        description: 'Tipo de prueba (smoke, performance, spike, load, endurance, scalability)'
+        description: 'Tipo de prueba (smoke, performance, spike, load, endurance, scalability, breakpoint,config-test,chaos-test)'
         required: true
         default: 'smoke'
 
@@ -63,3 +63,21 @@ jobs:
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: k6 run --out cloud scalability-test.js
+
+      - name: Run k6 breakpoint test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'breakpoint'
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        run: k6 run --out cloud breakpoint-test.js
+      
+      - name: Run k6 config test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'config-test'
+        env:
+         K6_CLOUD_TOKEN: ${{secrets.K6_CLOUD_TOKEN}}
+        run: k6 run --out cloud config-test.js
+
+      - name: Run k6 chaos test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'chaos'
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        run: k6 run --out cloud chaos-test.js
