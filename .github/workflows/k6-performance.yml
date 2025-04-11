@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       test_type:
-        description: 'Tipo de prueba (smoke, performance, spike, load)'
+        description: 'Tipo de prueba (smoke, performance, spike, load, endurance, scalability)'
         required: true
         default: 'smoke'
 
@@ -51,3 +51,15 @@ jobs:
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: k6 run --out cloud load-test.js
+
+      - name: Run k6 endurance test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'endurance'
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        run: k6 run --out cloud endurance-test.js
+
+      - name: Run k6 scalability test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'scalability'
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        run: k6 run --out cloud scalability-test.js
