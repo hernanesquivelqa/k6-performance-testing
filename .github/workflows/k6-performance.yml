@@ -77,7 +77,7 @@ jobs:
         run: k6 run --out cloud config-test.js
 
       - name: Run k6 chaos test
-        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'chaos'
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'chaos-test'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: k6 run --out cloud chaos-test.js
