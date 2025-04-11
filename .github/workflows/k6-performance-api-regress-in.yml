@@ -1,6 +1,12 @@
 name: k6 Performance Test API REGRESS.IN
 
 on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       test_type:
@@ -61,7 +67,7 @@ jobs:
           sudo apt-get install -y k6
 
       - name: Run selected k6 test
-        if: matrix.type == github.event.inputs.test_type
+        if: (github.event_name == 'workflow_dispatch' && matrix.type == github.event.inputs.test_type) || ((github.event_name == 'push' || github.event_name == 'pull_request') && matrix.type == 'smoke')
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: k6 run --out cloud ${{ matrix.path }}
