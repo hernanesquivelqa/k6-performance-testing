@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       test_type:
-        description: 'Tipo de prueba a ejecutar (smoke, performance, spike)'
+        description: 'Tipo de prueba (smoke, performance, spike, load)'
         required: true
         default: 'smoke'
 
@@ -34,8 +34,8 @@ jobs:
         if: github.event_name != 'workflow_dispatch' || inputs.test_type == 'smoke'
         run: k6 run smoke-test.js
 
-      - name: Run k6 stress test
-        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'stress'
+      - name: Run k6 performance test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'performance'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: k6 run --out cloud stress-test-csv.js
@@ -45,3 +45,9 @@ jobs:
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
         run: k6 run --out cloud spike-test.js
+
+      - name: Run k6 load test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'load'
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+        run: k6 run --out cloud load-test.js
