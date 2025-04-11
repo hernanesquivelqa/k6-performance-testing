@@ -28,8 +28,10 @@ export const options = {
   },
 };
 
-const USER = 'eve.holt@reqres.in';
-const PASSWORD = 'cityslicka';
+
+const USER = __ENV.USER 
+const PASSWORD = __ENV.PASSWORD 
+
 
 export default function () {
   const chaos = __ENV.CHAOS;

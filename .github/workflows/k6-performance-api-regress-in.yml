@@ -1,4 +1,4 @@
-name: k6 Performance Test
+name: k6 Performance Test API REGRESS.IN
 
 on:
   push:
@@ -17,6 +17,10 @@ on:
 jobs:
   k6-tests:
     runs-on: ubuntu-latest
+    
+    env:
+      USER: ${{ secrets.USER }}
+      PASSWORD: ${{ secrets.PASSWORD }}
 
     steps:
       - name: Checkout code
@@ -32,52 +36,52 @@ jobs:
 
       - name: Run k6 smoke test
         if: github.event_name != 'workflow_dispatch' || inputs.test_type == 'smoke'
-        run: k6 run smoke-test.js
+        run: k6 run test/api-regres-in/smoke/smoke-test.js
 
       - name: Run k6 performance test
         if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'performance'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: k6 run --out cloud stress-test-csv.js
+        run: k6 run --out cloud test/api-regres-in/stress/stress-test-csv.js
 
       - name: Run k6 spike test
         if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'spike'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: k6 run --out cloud spike-test.js
+        run: k6 run --out cloud  test/api-regres-in/spike/spike-test.js
 
       - name: Run k6 load test
         if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'load'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: k6 run --out cloud load-test.js
+        run: k6 run --out cloud  test/api-regres-in/load/load-test.js
 
       - name: Run k6 endurance test
         if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'endurance'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: k6 run --out cloud endurance-test.js
+        run: k6 run --out cloud  test/api-regres-in/endurance/endurance-test.js
 
       - name: Run k6 scalability test
         if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'scalability'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: k6 run --out cloud scalability-test.js
+        run: k6 run --out cloud  test/api-regres-in/scalability/scalability-test.js
 
       - name: Run k6 breakpoint test
         if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'breakpoint'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: k6 run --out cloud breakpoint-test.js
+        run: k6 run --out cloud  test/api-regres-in/breakpoint/breakpoint-test.js
       
       - name: Run k6 config test
         if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'config-test'
         env:
          K6_CLOUD_TOKEN: ${{secrets.K6_CLOUD_TOKEN}}
-        run: k6 run --out cloud config-test.js
+        run: k6 run --out cloud  test/api-regres-in/config/config-test.js
 
       - name: Run k6 chaos test
         if: github.event_name == 'workflow_dispatch' && inputs.test_type == 'chaos-test'
         env:
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
-        run: k6 run --out cloud chaos-test.js
+        run: k6 run --out cloud test/api-regres-in/regress/chaos-test.js

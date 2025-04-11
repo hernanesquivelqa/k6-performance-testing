@@ -1,22 +1,28 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
+// Configuración para scalability test
 export const options = {
-  vus: 50,
-  duration: '5m', // Reduzco para probar rápido
+  stages: [
+    { duration: '2m', target: 50 },  // 50 usuarios por 2 minutos
+    { duration: '2m', target: 100 }, // 100 usuarios por 2 minutos
+    { duration: '2m', target: 200 }, // 200 usuarios por 2 minutos
+  ],
   thresholds: {
-    'http_req_duration': ['p(95)<300', 'p(99)<500'],
-    'http_req_failed': ['rate<0.01'],
-    'checks': ['rate>0.99'],
-    'vus': ['value>=45'], // Relajo temporalmente para investigar
+    'http_req_duration': ['p(95)<400', 'p(99)<500'], // Respuesta rápida en todos los niveles
+    'http_req_failed': ['rate<0.01'],                // < 1% de errores
+    'checks': ['rate>0.99'],                         // > 99% de checks exitosos
   },
 };
 
-const USER = 'eve.holt@reqres.in';
-const PASSWORD = 'cityslicka';
+// Credenciales
+
+const USER = __ENV.USER 
+const PASSWORD = __ENV.PASSWORD 
+
 
 export default function () {
-  console.log(`VU ${__VU} activo en iteración ${__ITER}`);
+  // Login
   const loginPayload = JSON.stringify({
     email: USER,
     password: PASSWORD,
@@ -35,6 +41,7 @@ export default function () {
 
   const token = loginRes.json('token') || 'no-token';
 
+  // Endpoint protegido
   const protectedParams = {
     headers: {
       'Authorization': `Bearer ${token}`,

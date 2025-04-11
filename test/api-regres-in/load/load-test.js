@@ -1,10 +1,10 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-// Configuración mínima para smoke test
+// Configuración para load test
 export const options = {
-  vus: 1,          // Solo 1 usuario virtual
-  duration: '10s', // 10 segundos de duración
+  vus: 50,          // 50 usuarios virtuales
+  duration: '1m',   // 1 minuto de carga constante
   thresholds: {
     'http_req_duration': ['p(95)<500'], // 95% de respuestas < 500ms
     'http_req_failed': ['rate<0.01'],   // < 1% de errores
@@ -12,12 +12,14 @@ export const options = {
   },
 };
 
-// Credenciales estáticas para simplicidad
-const USER = 'eve.holt@reqres.in';
-const PASSWORD = 'cityslicka';
+// Credenciales
+
+const USER = __ENV.USER 
+const PASSWORD = __ENV.PASSWORD 
+
 
 export default function () {
-  // Paso 1: Login
+  // Login
   const loginPayload = JSON.stringify({
     email: USER,
     password: PASSWORD,
@@ -29,16 +31,15 @@ export default function () {
 
   const loginRes = http.post('https://reqres.in/api/login', loginPayload, loginParams);
 
-  // Verifico que el login funcione
   check(loginRes, {
     'login status es 200': (r) => r.status === 200,
     'token recibido': (r) => r.json('token') !== undefined,
   });
 
-  // Extraigo el token
   const token = loginRes.json('token');
 
-  // Paso 2: Accedo a un endpoint protegido
+
+  // Endpoint protegido
   const protectedParams = {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -48,11 +49,10 @@ export default function () {
 
   const protectedRes = http.get('https://reqres.in/api/users/2', protectedParams);
 
-  // Verifico que el acceso funcione
   check(protectedRes, {
     'protected status es 200': (r) => r.status === 200,
     'datos recibidos': (r) => r.json('data.id') === 2,
   });
 
-  sleep(1); // Pausa breve
+  sleep(1);
 }
